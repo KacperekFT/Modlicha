@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dziennik modliszki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E3EAD6; --surface:#F4F8EC; --ink:#1B2918; --muted:#58694F; --line:#C3CFB2;
+  --molt:#B8286A; --feed:#3C7A37; --molt-soft:#F2D3E1; --feed-soft:#D6E8CF;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#131B11; --surface:#1C2819; --ink:#E4ECD8; --muted:#9AAA8F; --line:#33452F;
+    --molt:#F06BA3; --feed:#86C77A; --molt-soft:#4A2336; --feed-soft:#25391F;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131B11; --surface:#1C2819; --ink:#E4ECD8; --muted:#9AAA8F; --line:#33452F;
+  --molt:#F06BA3; --feed:#86C77A; --molt-soft:#4A2336; --feed-soft:#25391F;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--body);-webkit-text-size-adjust:100%}
+main{max-width:600px;margin:0 auto;padding:20px 16px 40px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--molt);outline-offset:2px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px}
+
+/* identity */
+.id input.name{width:100%;border:0;border-bottom:2px dashed var(--line);background:transparent;padding:2px 0 6px;font:700 32px/1.15 var(--display);letter-spacing:-.01em}
+.id input.species{width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;padding:8px 0 6px;font-style:italic;font-size:17px;margin-top:4px}
+.id input::placeholder{color:var(--muted);opacity:.7;font-weight:500}
+.meta{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:14px;align-items:start}
+label.f{display:block;font-size:13px;color:var(--muted)}
+label.f input,label.f select,label.f textarea{display:block;width:100%;min-width:0;height:44px;margin:4px 0 0;padding:0 12px;border:1px solid var(--line);border-radius:10px;background-color:var(--bg);font-size:15px;line-height:42px;text-align:left;-webkit-appearance:none;appearance:none}
+label.f select{padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2358694F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.pick{position:relative;display:flex;align-items:center;height:44px;margin-top:4px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-size:15px;overflow:hidden}
+.pick .pv{pointer-events:none;white-space:nowrap}
+.pick .pv.ph{color:var(--muted)}
+label.f .pick input[type="date"]{position:absolute;top:0;left:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:0;font-size:16px;line-height:normal;background:transparent;display:block}
+
+/* stage hero */
+.stage{padding-top:20px}
+.stage .big{font:700 clamp(52px,16vw,76px)/1 var(--display);letter-spacing:-.03em;color:var(--molt)}
+.stage .cap{font-size:14px;color:var(--muted);margin-top:6px}
+.track{display:grid;grid-template-columns:repeat(9,1fr);margin-top:22px}
+.pip{position:relative;text-align:center;font-size:11px;color:var(--muted)}
+.pip i{display:block;width:18px;height:18px;border-radius:50%;margin:0 auto 6px;background:var(--surface);border:2px solid var(--line);position:relative;z-index:1}
+.pip::before{content:"";position:absolute;top:8px;left:-50%;width:100%;height:2px;background:var(--line)}
+.pip:first-child::before{display:none}
+.pip.done i{background:var(--feed);border-color:var(--feed)}
+.pip.done::before,.pip.now::before{background:var(--feed)}
+.pip.now i{background:var(--molt);border-color:var(--molt);box-shadow:0 0 0 4px var(--molt-soft)}
+.pip.now{color:var(--molt);font-weight:600}
+
+/* stats + actions */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px}
+.stat b{display:block;font:700 22px/1.1 var(--display)}
+.stat span{display:block;font-size:12px;color:var(--muted);margin-top:4px;line-height:1.3}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.btn{border:0;border-radius:14px;padding:14px 12px;font-weight:600;font-size:16px;cursor:pointer;color:#fff}
+.btn.molt{background:var(--molt)} .btn.feed{background:var(--feed)}
+:root:not([data-theme="light"]) .btn{color:#10190E}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .btn{color:#fff}}
+:root[data-theme="light"] .btn{color:#fff}
+
+/* calendar */
+.calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.calhead h2{margin:0;font:700 20px/1 var(--display);text-transform:capitalize}
+.nav{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-size:18px}
+.dow,.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dow span{text-align:center;font-size:12px;color:var(--muted);padding-bottom:4px}
+.cell{aspect-ratio:1/1;border:1px solid transparent;border-radius:10px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:0}
+.cell.empty{background:transparent;cursor:default}
+.cell b{font-weight:500;font-size:15px;line-height:1}
+.cell.molt{background:var(--molt-soft);border:2px solid var(--molt)}
+.cell.molt b{color:var(--molt);font-weight:700}
+.cell.today{border-color:var(--ink)}
+.cell.today.molt{border-color:var(--molt);box-shadow:0 0 0 2px var(--surface),0 0 0 3px var(--ink)}
+.dots{display:flex;gap:3px;height:6px}
+.dots s{width:6px;height:6px;border-radius:50%;background:var(--feed);display:block}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:5px;border:2px solid var(--molt);background:var(--molt-soft)}
+.sd{width:8px;height:8px;border-radius:50%;background:var(--feed)}
+
+/* history */
+h2.sec{margin:0 0 8px;font:700 20px/1.2 var(--display)}
+.item{display:grid;grid-template-columns:12px 1fr auto;gap:12px;align-items:start;padding:12px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}
+.mk{width:12px;height:12px;border-radius:50%;margin-top:6px}
+.mk.molt{background:var(--molt);box-shadow:0 0 0 3px var(--molt-soft)} .mk.feed{background:var(--feed)}
+.item strong{font-weight:600}
+.item small{display:block;color:var(--muted);font-size:14px}
+.item .when{text-align:right;font-size:14px;color:var(--muted);white-space:nowrap}
+.del{display:block;margin:4px 0 0 auto;border:0;background:none;color:var(--muted);font-size:13px;text-decoration:underline;cursor:pointer;padding:4px 0}
+.del.armed{color:var(--molt);font-weight:600}
+.empty-note{color:var(--muted);margin:6px 0 0}
+.foot{font-size:13px;color:var(--muted);text-align:center;margin-top:18px}
+
+/* dialog */
+dialog{border:1px solid var(--line);border-radius:20px;background:var(--surface);color:var(--ink);padding:20px;width:min(440px,calc(100% - 24px))}
+dialog::backdrop{background:rgba(10,18,8,.55)}
+dialog h3{margin:0 0 14px;font:700 22px/1.1 var(--display)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+.seg button{padding:10px;border-radius:12px;border:2px solid var(--line);background:var(--bg);cursor:pointer;font-weight:600}
+.seg button[aria-pressed="true"][data-type="molt"]{border-color:var(--molt);background:var(--molt-soft);color:var(--molt)}
+.seg button[aria-pressed="true"][data-type="feed"]{border-color:var(--feed);background:var(--feed-soft);color:var(--feed)}
+.stack{display:grid;gap:12px}
+.foodrow{display:grid;grid-template-columns:1.6fr 1fr;gap:12px}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.35}
+.chk input{width:20px;height:20px;margin:0;flex:none}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dlgfoot{display:grid;grid-template-columns:1fr 1.6fr;gap:10px;margin-top:16px}
+.ghost{border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:12px;font-weight:600;cursor:pointer}
+.hidden{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<main>
+
+  <section class="card id" aria-label="Twoja modliszka">
+    <input class="name" id="name" type="text" placeholder="Imię modliszki" maxlength="40" aria-label="Imię modliszki" autocomplete="off">
+    <input class="species" id="species" type="text" list="species-list" placeholder="Gatunek, np. Hierodula membranacea" maxlength="60" aria-label="Gatunek" autocomplete="off">
+    <datalist id="species-list">
+      <option value="Hierodula membranacea">
+      <option value="Hierodula patellifera">
+      <option value="Sphodromantis lineola">
+      <option value="Sphodromantis viridis">
+      <option value="Pseudocreobotra wahlbergii">
+      <option value="Creobroter gemmatus">
+      <option value="Hymenopus coronatus">
+      <option value="Idolomantis diabolica">
+      <option value="Gongylus gongylodes">
+      <option value="Deroplatys desiccata">
+      <option value="Phyllocrania paradoxa">
+      <option value="Blepharopsis mendica">
+      <option value="Rhombodera basalis">
+      <option value="Miomantis caffra">
+      <option value="Tenodera sinensis">
+      <option value="Mantis religiosa">
+      <option value="Empusa pennata">
+      <option value="Popa spurca">
+      <option value="Archimantis monstrosa">
+      <option value="Stagmomantis carolina">
+    </datalist>
+    <div class="meta">
+      <label class="f">Data wyklucia
+        <span class="pick"><span class="pv ph" id="hatchedTxt">Wybierz datę</span><input type="date" id="hatched"></span>
+      </label>
+      <label class="f">Aktualne stadium
+        <select id="stage">
+          <option value="1">L1</option><option value="2">L2</option><option value="3">L3</option>
+          <option value="4">L4</option><option value="5">L5</option><option value="6">L6</option>
+          <option value="7">L7</option><option value="8">L8</option><option value="9">Dorosła (imago)</option>
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <section class="card stage" aria-label="Stadium rozwoju">
+    <div class="big" id="stageBig">L4–L6</div>
+    <div class="cap" id="stageCap"></div>
+    <div class="track" id="track" aria-hidden="true"></div>
+  </section>
+
+  <section class="stats" id="stats" aria-label="Statystyki"></section>
+
+  <section class="actions">
+    <button class="btn molt" id="addMolt">Dodaj wylinkę</button>
+    <button class="btn feed" id="addFeed">Dodaj karmienie</button>
+  </section>
+
+  <section class="card" aria-label="Kalendarz">
+    <div class="calhead">
+      <button class="nav" id="prev" aria-label="Poprzedni miesiąc">‹</button>
+      <h2 id="monthTitle"></h2>
+      <button class="nav" id="next" aria-label="Następny miesiąc">›</button>
+    </div>
+    <div class="dow"><span>Pn</span><span>Wt</span><span>Śr</span><span>Cz</span><span>Pt</span><span>So</span><span>Nd</span></div>
+    <div class="grid" id="grid"></div>
+    <div class="legend">
+      <span><i class="sw"></i> wylinka</span>
+      <span><i class="sd"></i> karmienie</span>
+      <span>Dotknij dnia, żeby dodać wpis</span>
+    </div>
+  </section>
+
+  <section class="card" aria-label="Historia">
+    <h2 class="sec">Historia</h2>
+    <div id="history"></div>
+  </section>
+
+  <p class="foot" id="foot">Dane zapisują się w tej przeglądarce, na tym urządzeniu.</p>
+</main>
+
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <h3 id="dlgTitle">Nowy wpis</h3>
+  <div class="seg" role="group" aria-label="Rodzaj wpisu">
+    <button type="button" data-type="molt" aria-pressed="false">Wylinka</button>
+    <button type="button" data-type="feed" aria-pressed="true">Karmienie</button>
+  </div>
+  <div class="stack">
+    <label class="f">Data
+      <span class="pick"><span class="pv" id="dDateTxt"></span><input type="date" id="dDate"></span>
+    </label>
+    <div class="stack" id="feedFields">
+      <div class="foodrow">
+        <label class="f">Czym karmiona
+          <input type="text" id="dFood" list="food-list" placeholder="np. muszki owocówki" maxlength="60" autocomplete="off">
+        </label>
+        <label class="f">Ile zjadła (szt.)
+          <input type="number" id="dQty" min="0" max="999" inputmode="numeric" placeholder="np. 3">
+        </label>
+      </div>
+      <datalist id="food-list">
+        <option value="muszki owocówki"><option value="małe muchy"><option value="muchy"><option value="świerszcze"><option value="mszyce"><option value="larwy mącznika"><option value="ćmy">
+      </datalist>
+      <label class="f">Jak poszło
+        <select id="dResult">
+          <option value="zjadła">Zjadła</option>
+          <option value="część">Zjadła część</option>
+          <option value="odmówiła">Odmówiła</option>
+        </select>
+      </label>
+    </div>
+    <label class="f">Notatka (opcjonalnie)
+      <input type="text" id="dNote" maxlength="120" placeholder="np. brzuch wydaje się gruby" autocomplete="off">
+    </label>
+    <label class="chk hidden" id="moltFields"><input type="checkbox" id="dBump"><span>Podnieś stadium o 1 (odznacz dla starszych wylinek, które są już wliczone w aktualne stadium)</span></label>
+  </div>
+  <div class="dlgfoot">
+    <button type="button" class="ghost" id="dCancel">Anuluj</button>
+    <button type="button" class="btn feed" id="dSave">Zapisz karmienie</button>
+  </div>
+</dialog>
+
+<script>
+(function(){
+  var KEY='mantis-tracker-v1', storageOk=true;
+  var DEFAULT={name:'',species:'',hatched:'',stage:5,entries:[]};
+  var state=load();
+  var today=new Date();
+  var view={y:today.getFullYear(),m:today.getMonth()};
+  var dlgType='feed';
+
+  function load(){
+    try{
+      var raw=localStorage.getItem(KEY);
+      if(raw){
+        var s=JSON.parse(raw);
+        var st=parseInt(s.stage,10); if(!st) st=5;
+        return {name:s.name||'',species:s.species||'',hatched:s.hatched||'',stage:Math.min(9,Math.max(1,st)),entries:Array.isArray(s.entries)?s.entries:[]};
+      }
+    }catch(e){storageOk=false;}
+    return JSON.parse(JSON.stringify(DEFAULT));
+  }
+  function save(){
+    try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){storageOk=false;showFoot();}
+  }
+  function showFoot(){
+    if(!storageOk) document.getElementById('foot').textContent='Zapis w przeglądarce jest niedostępny – wpisy znikną po zamknięciu strony.';
+  }
+
+  var $=function(id){return document.getElementById(id)};
+  var pad=function(n){return String(n).padStart(2,'0')};
+  var iso=function(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+  var parse=function(s){var p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2])};
+  var todayISO=function(){return iso(new Date())};
+  var diff=function(a,b){return Math.round((parse(b)-parse(a))/864e5)};
+  var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+  function plural(n,f){ if(n===1) return f[0]; var l=n%10,t=n%100; return (l>=2&&l<=4&&!(t>=12&&t<=14))?f[1]:f[2]; }
+  function fmt(s){return parse(s).toLocaleDateString('pl-PL',{day:'numeric',month:'short',year:'numeric'})}
+  function updatePick(id){var v=$(id).value,t=$(id+'Txt');t.textContent=v?fmt(v):'Wybierz datę';t.classList.toggle('ph',!v);}
+  function molts(){return state.entries.filter(function(e){return e.type==='molt'})}
+  function sorted(type){
+    return state.entries.filter(function(e){return !type||e.type===type}).sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:0});
+  }
+
+  /* ---------- stage ---------- */
+  function stageLabel(n){return n>=9?'dorosła':'L'+n}
+  function renderStage(){
+    var st=state.stage, m=molts().length;
+    $('stageBig').textContent=stageLabel(st);
+    $('stageCap').textContent='Wylinek w dzienniku: '+m+'. Nowa wylinka podnosi stadium o jeden.';
+    var h='';
+    for(var i=1;i<=9;i++){
+      var cls=i<st?'done':(i===st?'now':'');
+      h+='<div class="pip '+cls+'"><i></i>'+(i===9?'imago':'L'+i)+'</div>';
+    }
+    $('track').innerHTML=h;
+  }
+
+  /* ---------- stats ---------- */
+  function since(list){
+    var t=todayISO();
+    var past=list.filter(function(e){return e.date<=t});
+    if(!past.length) return null;
+    return diff(past[past.length-1].date,t);
+  }
+  function dayText(n){ if(n===null) return '—'; if(n===0) return 'dziś'; if(n===1) return 'wczoraj'; return n+' dni'; }
+  function renderStats(){
+    var ms=sorted('molt'), fs=sorted('feed');
+    var avg='—';
+    if(ms.length>=2){
+      var tot=diff(ms[0].date,ms[ms.length-1].date);
+      avg=Math.round(tot/(ms.length-1))+' dni';
+    }
+    var age='—';
+    if(state.hatched){var a=diff(state.hatched,todayISO()); if(a>=0) age=a+' '+plural(a,['dzień','dni','dni']);}
+    $('stats').innerHTML=
+      '<div class="stat"><b>'+age+'</b><span>wiek od wyklucia</span></div>'+
+      '<div class="stat"><b>'+dayText(since(ms))+'</b><span>od ostatniej wylinki</span></div>'+
+      '<div class="stat"><b>'+dayText(since(fs))+'</b><span>od ostatniego karmienia</span></div>'+
+      '<div class="stat"><b>'+avg+'</b><span>średnio między wylinkami</span></div>';
+  }
+
+  /* ---------- calendar ---------- */
+  function renderCal(){
+    var y=view.y, m=view.m;
+    $('monthTitle').textContent=new Date(y,m,1).toLocaleDateString('pl-PL',{month:'long',year:'numeric'});
+    var off=(new Date(y,m,1).getDay()+6)%7;
+    var days=new Date(y,m+1,0).getDate();
+    var by={};
+    state.entries.forEach(function(e){(by[e.date]=by[e.date]||[]).push(e)});
+    var t=todayISO(), h='', i;
+    for(i=0;i<off;i++) h+='<span class="cell empty"></span>';
+    for(i=1;i<=days;i++){
+      var ds=y+'-'+pad(m+1)+'-'+pad(i), es=by[ds]||[];
+      var mo=es.some(function(e){return e.type==='molt'});
+      var fe=es.filter(function(e){return e.type==='feed'}).length;
+      var cls='cell'+(mo?' molt':'')+(ds===t?' today':'');
+      var label=i+' '+new Date(y,m,1).toLocaleDateString('pl-PL',{month:'long'});
+      if(mo) label+=', wylinka';
+      if(fe) label+=', karmień: '+fe;
+      var dots=''; for(var k=0;k<Math.min(fe,3);k++) dots+='<s></s>';
+      h+='<button class="'+cls+'" data-date="'+ds+'" aria-label="'+esc(label)+'"><b>'+i+'</b><span class="dots">'+dots+'</span></button>';
+    }
+    $('grid').innerHTML=h;
+  }
+
+  /* ---------- history ---------- */
+  function renderHistory(){
+    var list=state.entries.slice().sort(function(a,b){
+      if(a.date!==b.date) return a.date<b.date?1:-1;
+      return String(b.id)<String(a.id)?-1:1;
+    });
+    if(!list.length){
+      $('history').innerHTML='<p class="empty-note">Na razie pusto. Zapisz pierwszą wylinkę albo karmienie.</p>';
+      return;
+    }
+    var total=0; state.entries.forEach(function(e){if(e.qty>0) total+=e.qty;});
+    $('history').innerHTML=(total?'<p class="empty-note">Razem zjedzone: '+total+' szt.</p>':'')+list.map(function(e){
+      var title, sub=[];
+      if(e.type==='molt'){ title='Wylinka'; }
+      else {
+        title='Karmienie'+(e.result?' · '+esc(e.result):'');
+        var amt=(e.qty>0)?(e.qty+' '+(e.food?'× ':'szt.')):'';
+        if(amt||e.food) sub.push(esc(amt+(e.food||'')));
+      }
+      if(e.note) sub.push(esc(e.note));
+      return '<div class="item">'+
+        '<span class="mk '+e.type+'"></span>'+
+        '<div><strong>'+title+'</strong>'+(sub.length?'<small>'+sub.join(' – ')+'</small>':'')+'</div>'+
+        '<div class="when">'+fmt(e.date)+'<button class="del" data-del="'+esc(e.id)+'">Usuń</button></div>'+
+      '</div>';
+    }).join('');
+  }
+
+  function renderAll(){renderStage();renderStats();renderCal();renderHistory();}
+
+  /* ---------- identity fields ---------- */
+  $('name').value=state.name;
+  $('species').value=state.species;
+  $('hatched').value=state.hatched; updatePick('hatched');
+  $('stage').value=String(state.stage);
+  $('name').addEventListener('input',function(e){state.name=e.target.value;save()});
+  $('species').addEventListener('input',function(e){state.species=e.target.value;save()});
+  ['change','input'].forEach(function(ev){$('hatched').addEventListener(ev,function(e){state.hatched=e.target.value;updatePick('hatched');save();renderStats()})});
+  $('stage').addEventListener('change',function(e){state.stage=parseInt(e.target.value,10);save();renderStage()});
+
+  /* ---------- dialog ---------- */
+  var dlg=$('dlg');
+  function setType(t){
+    dlgType=t;
+    document.querySelectorAll('.seg button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.type===t))});
+    $('feedFields').classList.toggle('hidden',t!=='feed');
+    $('moltFields').classList.toggle('hidden',t!=='molt');
+    var s=$('dSave');
+    s.textContent=t==='molt'?'Zapisz wylinkę':'Zapisz karmienie';
+    s.className='btn '+(t==='molt'?'molt':'feed');
+    $('dlgTitle').textContent=t==='molt'?'Nowa wylinka':'Nowe karmienie';
+  }
+  function openDlg(type,date){
+    setType(type);
+    $('dDate').value=date||todayISO(); updatePick('dDate');
+    $('dFood').value='';$('dQty').value='';$('dNote').value='';$('dResult').value='zjadła';
+    syncBump();
+    if(dlg.showModal) dlg.showModal(); else dlg.setAttribute('open','');
+  }
+  function syncBump(){ $('dBump').checked=($('dDate').value>=todayISO()); }
+  ['change','input'].forEach(function(ev){$('dDate').addEventListener(ev,function(){updatePick('dDate');syncBump();})});
+  function closeDlg(){ if(dlg.close) dlg.close(); else dlg.removeAttribute('open'); }
+  document.querySelectorAll('.seg button').forEach(function(b){b.addEventListener('click',function(){setType(b.dataset.type)})});
+  $('addMolt').addEventListener('click',function(){openDlg('molt')});
+  $('addFeed').addEventListener('click',function(){openDlg('feed')});
+  $('dCancel').addEventListener('click',closeDlg);
+  $('dSave').addEventListener('click',function(){
+    var d=$('dDate').value;
+    if(!d){$('dDate').focus();return;}
+    var e={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),type:dlgType,date:d,note:$('dNote').value.trim()};
+    if(dlgType==='feed'){e.food=$('dFood').value.trim();e.result=$('dResult').value;var q=parseInt($('dQty').value,10);if(q>0)e.qty=Math.min(q,999);}
+    if(dlgType==='molt'&&$('dBump').checked){e.bump=true;state.stage=Math.min(9,state.stage+1);$('stage').value=String(state.stage);}
+    state.entries.push(e);
+    save();
+    var pd=parse(d); view.y=pd.getFullYear(); view.m=pd.getMonth();
+    closeDlg(); renderAll();
+  });
+
+  /* ---------- calendar + history events ---------- */
+  $('grid').addEventListener('click',function(e){
+    var b=e.target.closest('.cell[data-date]'); if(b) openDlg('feed',b.dataset.date);
+  });
+  $('prev').addEventListener('click',function(){view.m--;if(view.m<0){view.m=11;view.y--}renderCal()});
+  $('next').addEventListener('click',function(){view.m++;if(view.m>11){view.m=0;view.y++}renderCal()});
+  $('history').addEventListener('click',function(e){
+    var b=e.target.closest('.del'); if(!b) return;
+    if(b.classList.contains('armed')){
+      var id=b.dataset.del;
+      var gone=state.entries.filter(function(x){return String(x.id)===id})[0];
+      if(gone&&gone.bump){state.stage=Math.max(1,state.stage-1);$('stage').value=String(state.stage);}
+      state.entries=state.entries.filter(function(x){return String(x.id)!==id});
+      save(); renderAll();
+    } else {
+      b.classList.add('armed'); b.textContent='Na pewno?';
+      setTimeout(function(){ if(b.isConnected){b.classList.remove('armed');b.textContent='Usuń';} },3000);
+    }
+  });
+
+  showFoot();
+  renderAll();
+})();
+</script>
+</body>
+</html>
